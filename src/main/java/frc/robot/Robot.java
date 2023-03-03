@@ -17,27 +17,40 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Compressor;
 
 
 public class Robot extends TimedRobot {
   // Drive Train Motors
   // Each motor in the drive train is declared
-  private final CANSparkMax frontLeft = new CANSparkMax(0); //CAN ID is set on the sparkmax 
-  private final CANSparkMax backLeft = new CANSparkMax(1); // Motortype must also be set for the neo it is brushless.
-  private final CANSparkMax frontRight = new CANSparkMax(2);
-  private final CANSparkMax backRight = new CANSparkMax(3);
+  private final CANSparkMax frontLeft = new CANSparkMax(0, MotorType.kbrushless); //CAN ID is set on the sparkmax 
+  private final CANSparkMax backLeft = new CANSparkMax(1, MotorType.kbrushless); // Motortype must also be set for the neo it is brushless.
+  private final CANSparkMax frontRight = new CANSparkMax(2, MotorType.kbrushless);
+  private final CANSparkMax backRight = new CANSparkMax(3, MotorType.kbrushless);
   // Two motor control groups are declared to control the left and right side of the robot as one group.
   private final MotorControllerGroup leftDrive = new MotorControllerGroup(frontLeft, backLeft);
   private final MotorControllerGroup rightDrive = new MotorControllerGroup(frontRight, backRight);
   // the Differential Drive is declared and named msClarke
   private final DifferentialDrive msClarke = new DifferentialDrive(leftDrive, rightDrive); //the two motor control groups are added to the differential drive as parameters
   // Arm/Claw Motors
-
+  private final CANSparkMax leftIntake = new CANSparkMax(4, MotorType.kbrushless);
+  private final CANSparkMax rightIntake = new CANSparkMax(5, MotorType.kbrushless);
+  private final CANSparkMax teleScope = new CANSparkMax(6, MotorType.kbrushless);
+  private final CANSparkMax tiltArm = new CANSparkMax(7, MotorType.kbushless);
   //Solenoids
   private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
   private static final int kSolenoidButton = 1;
-  private static final int kDoubleSolenoidForward = 2;
+  private static final int kDoubleSolenoidForward = 2; //the button which operates the solenoid
   private static final int kDoubleSolenoidReverse = 3;
+  // Compressor Varibales [RO] still working on figuring this out.
+  Compressor pcmCompressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
+  //Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
+  //pcmCompressor.enableDigital();
+  //pcmCompressor.disable();
+  //boolean enabled = pcmCompressor.IsEnabled();
+  //boolean pressureSwitch = pcmCompressor.getPressureSwitchValue();
+  //double current = pcmCompressor.getCompressorCurrent();
+  
   // Other varibables
   private final XboxController m_controller = new XboxController(0); //Xbox controller is usually detected in port 0
   private final Timer m_timer = new Timer(); // a timer is needed for autonomous mode
@@ -80,9 +93,12 @@ public class Robot extends TimedRobot {
     // Claw Controls
 
     // Extend Pnumatic Cylinder
-    if (m_controller.getRawButton(kDoubleSolenoidForward)) {
+    if (m_controller.getYButtonPressed()) { // use the Y button to toggle the claw open or closed.
+      m_doubleSolenoid.toggle();
+    }
+    if (m_controller.getAButtonPressed()) { // use the A button to extend the cylinder
       m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
-    } else if (m_controller.getRawButton(kDoubleSolenoidReverse)) {
+    } else if (m_controller.getBButtonPressed()) { // use the B button to retract the cylinder
       m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
   }
 }
