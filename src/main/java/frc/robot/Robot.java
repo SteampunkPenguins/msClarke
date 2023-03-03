@@ -35,6 +35,7 @@ public class Robot extends TimedRobot {
   // Arm/Claw Motors
   private final CANSparkMax leftIntake = new CANSparkMax(4, MotorType.kbrushless);
   private final CANSparkMax rightIntake = new CANSparkMax(5, MotorType.kbrushless);
+  private final DifferentialDrive clawIntake = new DifferentialDrive(leftIntake, rightIntake);
   private final CANSparkMax teleScope = new CANSparkMax(6, MotorType.kbrushless);
   private final CANSparkMax tiltArm = new CANSparkMax(7, MotorType.kbushless);
   //Solenoids
@@ -59,6 +60,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     rightDrive.setInverted(true); //On side of the robot's drivetrain must be inverted so that the motors can turn in same relative direction.
+    rightIntake.setInverted(true);
   }
 
   //This function is run once each time the robot enters autonomous mode.
@@ -89,8 +91,19 @@ public class Robot extends TimedRobot {
     //Drive Train controls
     msClarke.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
     // Arm Controls
-
+    if (m_controller.getRightBumperPressed()) {
+      tiltArm.set(0.1);
+    } else {
+      tiltArm.stopMotor();
+    }
+    if (m_controller.getLeftBumperPressed()) {
+      tiltArm.set(-0.1);
+    } else {
+      tiltArm.stopMotor();
+    }
+    teleScope.set(m_controller.getRightTriggerAxis());
     // Claw Controls
+    clawIntake.arcadeDrive(m_controller.getLeftTriggerAxis(), 0.0);
 
     // Extend Pnumatic Cylinder
     if (m_controller.getYButtonPressed()) { // use the Y button to toggle the claw open or closed.
