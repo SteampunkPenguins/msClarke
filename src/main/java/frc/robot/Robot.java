@@ -1,6 +1,4 @@
-/* This is the master code for the robot. At this time it is not modulized
- * Add comments for each thing that you add. Try and explain what it does and where it gets
- * the parameters which it uses.
+/* This is the branch for trying out a two controller scheme
  */
 
 package frc.robot;
@@ -50,7 +48,8 @@ import edu.wpi.first.wpilibj.Compressor;
    //double current = pcmCompressor.getCompressorCurrent();
    
    // Other varibables
-   private final XboxController m_controller = new XboxController(0); //Xbox controller is usually detected in port 0
+   private final XboxController armClaw = newXboxController(1); // seperate controller to operate the claw.
+   private final XboxController pilot = new XboxController(0); // seperate controller to drive
    private final Timer m_timer = new Timer(); // a timer is needed for autonomous mode
  
    //This function is run when the robot is first started up and should be used for any initialization code.
@@ -89,29 +88,19 @@ import edu.wpi.first.wpilibj.Compressor;
    @Override
    public void teleopPeriodic() {
      //Drive Train controls
-     msClarke.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
+     msClarke.arcadeDrive(-pilot.getLeftY(), -pilot.getRightX());
      // Arm Controls
-     if (m_controller.getRightBumperPressed()) {
-       tiltArm.set(0.1);
-     } else {
-       tiltArm.stopMotor();
-     }
-     if (m_controller.getLeftBumperPressed()) {
-       tiltArm.set(-0.1);
-     } else {
-       tiltArm.stopMotor();
-     }
-     teleScope.set(m_controller.getRightTriggerAxis());
+     tiltArm.set(-armClaw.getLeftY();
+     teleScope.set(-armClaw.getRightY());
      // Claw Controls
-     rightIntake.set(m_controller.getLeftTriggerAxis());
- 
+     rightIntake.set(armClaw.getLeftTriggerAxis());
      // Extend Pneumatic Cylinder
-     if (m_controller.getYButtonPressed()) { // use the Y button to toggle the claw open or closed.
+     if (armClaw.getYButtonPressed()) { // use the Y button to toggle the claw open or closed.
        m_doubleSolenoid.toggle();
      }
-     if (m_controller.getAButtonPressed()) { // use the A button to extend the cylinder
+     if (armClaw.getAButtonPressed()) { // use the A button to extend the cylinder
        m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
-     } else if (m_controller.getBButtonPressed()) { // use the B button to retract the cylinder
+     } else if (armClaw.getBButtonPressed()) { // use the B button to retract the cylinder
        m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
    }
  }
