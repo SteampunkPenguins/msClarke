@@ -89,7 +89,7 @@ import edu.wpi.first.wpilibj.Compressor;
    @Override
    public void teleopPeriodic() {
      //Drive Train controls
-     msClarke.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
+     msClarke.tankDrive(-m_controller.getLeftY(), -m_controller.getRightY()); // this like is changed for tank drive. It uses both the Y axis on left and right.
      // Arm Controls
      if (m_controller.getRightBumperPressed()) {
        tiltArm.set(0.1);
