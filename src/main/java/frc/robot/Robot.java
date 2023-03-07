@@ -57,7 +57,7 @@ import edu.wpi.first.wpilibj.Compressor;
    @Override
    public void robotInit() {
      rightDrive.setInverted(true); //On side of the robot's drivetrain must be inverted so that the motors can turn in same relative direction.
-     lefttIntake.follow(rightIntake, true); // A leader/follower (formerly master/slave) protocol for the intake motors. The "true" boolean inverts one side.
+     leftIntake.follow(rightIntake, true); // A leader/follower (formerly master/slave) protocol for the intake motors. The "true" boolean inverts one side.
    }
  
    //This function is run once each time the robot enters autonomous mode.
