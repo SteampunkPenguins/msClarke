@@ -32,17 +32,17 @@ import edu.wpi.first.wpilibj.Compressor;
    // Arm/Claw Motors
    private final CANSparkMax leftIntake = new CANSparkMax(4, MotorType.kBrushless);
    private final CANSparkMax rightIntake = new CANSparkMax(5, MotorType.kBrushless);
-   private final DifferentialDrive clawIntake = new DifferentialDrive(leftIntake, rightIntake);
    private final CANSparkMax teleScope = new CANSparkMax(6, MotorType.kBrushless);
    private final CANSparkMax tiltArm = new CANSparkMax(7, MotorType.kBrushless);
    //Solenoids
    private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
-   private static final int kSolenoidButton = 1;
-   private static final int kDoubleSolenoidForward = 2; //the button which operates the solenoid
-   private static final int kDoubleSolenoidReverse = 3;
+  //The below 3 "private static final" integers are reserved for the black joysticks (Joystick library) [TQ] 
+  //private static final int kSolenoidButton = 1;
+   //private static final int kDoubleSolenoidForward = 2; //the button which operates the solenoid
+   //private static final int kDoubleSolenoidReverse = 3;
    // Compressor Varibales [RO] still working on figuring this out.
    Compressor pcmCompressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
-   //Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
+   
    //pcmCompressor.enableDigital();
    //pcmCompressor.disable();
    //boolean enabled = pcmCompressor.IsEnabled();
@@ -57,7 +57,7 @@ import edu.wpi.first.wpilibj.Compressor;
    @Override
    public void robotInit() {
      rightDrive.setInverted(true); //On side of the robot's drivetrain must be inverted so that the motors can turn in same relative direction.
-     rightIntake.setInverted(true);
+     lefttIntake.follow(rightIntake, true); // A leader/follower (formerly master/slave) protocol for the intake motors. The "true" boolean inverts one side.
    }
  
    //This function is run once each time the robot enters autonomous mode.
@@ -81,7 +81,9 @@ import edu.wpi.first.wpilibj.Compressor;
  
    //This function is called once each time the robot enters teleoperated mode.
    @Override
-   public void teleopInit() {}
+   public void teleopInit() {
+      pcmCompressor.enableDigital(); //Turns on compressor when Teleop is enabled
+   }
  
    //This function is called periodically during teleoperated mode.
    @Override
@@ -101,9 +103,9 @@ import edu.wpi.first.wpilibj.Compressor;
      }
      teleScope.set(m_controller.getRightTriggerAxis());
      // Claw Controls
-     clawIntake.arcadeDrive(m_controller.getLeftTriggerAxis(), 0.0);
+     rightIntake.set(m_controller.getLeftTriggerAxis());
  
-     // Extend Pnumatic Cylinder
+     // Extend Pneumatic Cylinder
      if (m_controller.getYButtonPressed()) { // use the Y button to toggle the claw open or closed.
        m_doubleSolenoid.toggle();
      }
