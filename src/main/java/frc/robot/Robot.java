@@ -32,32 +32,36 @@ import edu.wpi.first.wpilibj.Compressor;
    // Arm/Claw Motors
    private final CANSparkMax leftIntake = new CANSparkMax(4, MotorType.kBrushless);
    private final CANSparkMax rightIntake = new CANSparkMax(5, MotorType.kBrushless);
+   //private final DifferentialDrive clawIntake = new DifferentialDrive(leftIntake, rightIntake);
    private final CANSparkMax teleScope = new CANSparkMax(6, MotorType.kBrushless);
    private final CANSparkMax tiltArm = new CANSparkMax(7, MotorType.kBrushless);
+   
    //Solenoids
    private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
-  //The below 3 "private static final" integers are reserved for the black joysticks (Joystick library) [TQ] 
-  //private static final int kSolenoidButton = 1;
+   private final DoubleSolenoid secondSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 4);
+   //private static final int kSolenoidButton = 1;
    //private static final int kDoubleSolenoidForward = 2; //the button which operates the solenoid
    //private static final int kDoubleSolenoidReverse = 3;
    // Compressor Varibales [RO] still working on figuring this out.
    Compressor pcmCompressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
-   
+   //Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
    //pcmCompressor.enableDigital();
    //pcmCompressor.disable();
    //boolean enabled = pcmCompressor.IsEnabled();
    //boolean pressureSwitch = pcmCompressor.getPressureSwitchValue();
    //double current = pcmCompressor.getCompressorCurrent();
    
-   // Other varibables
-   private final XboxController m_controller = new XboxController(0); //Xbox controller is usually detected in port 0
+   // Other variables
+   private final XboxController driver = new XboxController(0); //Xbox controller is usually detected in port 0
+   private final XboxController armController = new XboxController(1); 
    private final Timer m_timer = new Timer(); // a timer is needed for autonomous mode
  
    //This function is run when the robot is first started up and should be used for any initialization code.
    @Override
    public void robotInit() {
      rightDrive.setInverted(true); //On side of the robot's drivetrain must be inverted so that the motors can turn in same relative direction.
-     leftIntake.follow(rightIntake, true); // A leader/follower (formerly master/slave) protocol for the intake motors. The "true" boolean inverts one side.
+     //rightIntake.setInverted(true);
+     leftIntake.follow(rightIntake, true);
    }
  
    //This function is run once each time the robot enters autonomous mode.
@@ -71,7 +75,7 @@ import edu.wpi.first.wpilibj.Compressor;
    @Override
    public void autonomousPeriodic() {
      // Drive for 2 seconds
-     if (m_timer.get() < 2.0) {
+     if (m_timer.get() < 15.0) {
        // Drive forwards half speed, make sure to turn input squaring off
        msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
      } else {
@@ -82,37 +86,35 @@ import edu.wpi.first.wpilibj.Compressor;
    //This function is called once each time the robot enters teleoperated mode.
    @Override
    public void teleopInit() {
-      pcmCompressor.enableDigital(); //Turns on compressor when Teleop is enabled
+    pcmCompressor.enableDigital();
    }
  
    //This function is called periodically during teleoperated mode.
    @Override
    public void teleopPeriodic() {
      //Drive Train controls
-     msClarke.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
+     msClarke.arcadeDrive(-driver.getLeftY(), -driver.getRightX());
      // Arm Controls
-     if (m_controller.getRightBumperPressed()) {
-       tiltArm.set(0.1);
-     } else {
-       tiltArm.stopMotor();
-     }
-     if (m_controller.getLeftBumperPressed()) {
-       tiltArm.set(-0.1);
-     } else {
-       tiltArm.stopMotor();
-     }
-     teleScope.set(m_controller.getRightTriggerAxis());
+     teleScope.set(armController.getLeftY());
+
+     tiltArm.set(armController.getRightY());
      // Claw Controls
-     rightIntake.set(m_controller.getLeftTriggerAxis());
+    // clawIntake.arcadeDrive(m_controller.getLeftTriggerAxis(), 0.0);
+    if (armController.getBButtonPressed()) {
+        rightIntake.set(0.5);
+    }
  
      // Extend Pneumatic Cylinder
-     if (m_controller.getYButtonPressed()) { // use the Y button to toggle the claw open or closed.
-       m_doubleSolenoid.toggle();
-     }
-     if (m_controller.getAButtonPressed()) { // use the A button to extend the cylinder
+     //if (armController.getYButtonPressed()) { // use the Y button to toggle the claw open or closed.
+     //  m_doubleSolenoid.toggle();
+     //}
+     
+     if (armController.getRightBumperPressed()) { // use the A button to extend the cylinder
        m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
-     } else if (m_controller.getBButtonPressed()) { // use the B button to retract the cylinder
+       secondSolenoid.set(DoubleSolenoid.Value.kForward);
+     } else if (armController.getLeftBumperPressed()) { // use the B button to retract the cylinder
        m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+       secondSolenoid.set(DoubleSolenoid.Value.kReverse);
    }
  }
  
@@ -120,7 +122,7 @@ import edu.wpi.first.wpilibj.Compressor;
    @Override
    public void testInit() {}
  
-   //his function is called periodically during test mode.
+   //This function is called periodically during test mode.
    @Override
    public void testPeriodic() {}
  }
