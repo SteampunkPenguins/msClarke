@@ -5,16 +5,18 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+//import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Compressor;
  
  
  public class Robot extends TimedRobot {
@@ -59,9 +61,11 @@ import edu.wpi.first.wpilibj.Compressor;
    //This function is run when the robot is first started up and should be used for any initialization code.
    @Override
    public void robotInit() {
-     rightDrive.setInverted(true); //On side of the robot's drivetrain must be inverted so that the motors can turn in same relative direction.
+     //rightDrive.setInverted(true); //On side of the robot's drivetrain must be inverted so that the motors can turn in same relative direction.
      //rightIntake.setInverted(true);
      leftIntake.follow(rightIntake, true);
+     m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+     secondSolenoid.set(DoubleSolenoid.Value.kForward);
    }
  
    //This function is run once each time the robot enters autonomous mode.
@@ -69,24 +73,66 @@ import edu.wpi.first.wpilibj.Compressor;
    public void autonomousInit() {
      m_timer.reset();
      m_timer.start();
+     leftDrive.setInverted(true);
    }
  
    //This function is called periodically (20ms) during autonomous.
    @Override
    public void autonomousPeriodic() {
      // Drive for 2 seconds
-     if (m_timer.get() < 15.0) {
+     if ((m_timer.get() >0 ) && (m_timer.get()<2)) {
        // Drive forwards half speed, make sure to turn input squaring off
-       msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
-     } else {
-       msClarke.stopMotor(); // stop robot
+       //msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
+       //msClarke.arcadeDrive(0.0, 0.5, isAutonomous());
+       tiltArm.set(0.5); //smaller
      }
-   }
+     if ((m_timer.get() >2 ) && (m_timer.get()<4)) {
+      tiltArm.stopMotor();
+       teleScope.set(0.5);
+     }
+     if ((m_timer.get() >4 ) && (m_timer.get()<6)) {
+      teleScope.stopMotor();
+       //m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse); //only for cones (just in case)
+       //secondSolenoid.set(DoubleSolenoid.Value.kReverse);
+      
+       rightIntake.set(0.5);
+     }
+     if ((m_timer.get() >6 ) && (m_timer.get()<8)) {
+      rightIntake.stopMotor();
+      teleScope.setInverted(true);
+       teleScope.set(0.5);
+     }
+     if ((m_timer.get() >8 ) && (m_timer.get()<10)) {
+      teleScope.stopMotor();
+       tiltArm.set(0.5); //bigger
+     }
+     if ((m_timer.get() >10 ) && (m_timer.get()<12)) {
+      tiltArm.stopMotor();
+      teleScope.setInverted(false);
+        teleScope.set(0.5);
+     }
+     if ((m_timer.get() >12 ) && (m_timer.get()<14)) {
+      teleScope.stopMotor();
+       //m_doubleSolenoid.set(DoubleSolenoid.Value.kForward); //for cones again*
+       //secondSolenoid.set(DoubleSolenoid.Value.kForward);
+     }
+      teleScope.setInverted(true);
+       teleScope.set(0.5);
+
+       if (m_timer.get() >14) {
+        teleScope.stopMotor();
+       }
+     }
+    
+   
  
    //This function is called once each time the robot enters teleoperated mode.
    @Override
    public void teleopInit() {
     pcmCompressor.enableDigital();
+    rightDrive.setInverted(true);
+    leftDrive.setInverted(false);
+    teleScope.setInverted(false);
    }
  
    //This function is called periodically during teleoperated mode.
