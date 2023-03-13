@@ -11,7 +11,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.
+ Robot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -57,6 +58,9 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
    private final XboxController driver = new XboxController(0); //Xbox controller is usually detected in port 0
    private final XboxController armController = new XboxController(1); 
    private final Timer m_timer = new Timer(); // a timer is needed for autonomous mode
+   
+   //Autonomous
+   private final integer bellerika = 1
  
    //This function is run when the robot is first started up and should be used for any initialization code.
    @Override
@@ -79,39 +83,18 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
    //This function is called periodically (20ms) during autonomous.
    @Override
    public void autonomousPeriodic() {
+    if (bellerika == 1) {
      // Drive for 2 seconds
+     // cube and jet
      if ((m_timer.get() >0 ) && (m_timer.get()<2)) {
-       // Drive forwards half speed, make sure to turn input squaring off
-       //msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
-       //msClarke.arcadeDrive(0.0, 0.5, isAutonomous());
-       tiltArm.set(0.5); //smaller
-     }
-     if ((m_timer.get() >2 ) && (m_timer.get()<4)) {
-      tiltArm.stopMotor();
-       teleScope.set(0.5);
-     }
-     if ((m_timer.get() >4 ) && (m_timer.get()<6)) {
-      teleScope.stopMotor();
-       //m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse); //only for cones (just in case)
-       //secondSolenoid.set(DoubleSolenoid.Value.kReverse);
-      
-       rightIntake.set(0.5);
-     }
-     if ((m_timer.get() >6 ) && (m_timer.get()<8)) {
-      rightIntake.stopMotor();
-      teleScope.setInverted(true);
-       teleScope.set(0.5);
-     }
-     if ((m_timer.get() >8 ) && (m_timer.get()<10)) {
-      teleScope.stopMotor();
        tiltArm.set(0.5); //bigger
      }
-     if ((m_timer.get() >10 ) && (m_timer.get()<12)) {
+     if ((m_timer.get() >2 ) && (m_timer.get()<4)) {
       tiltArm.stopMotor();
       teleScope.setInverted(false);
         teleScope.set(0.5);
      }
-     if ((m_timer.get() >12 ) && (m_timer.get()<14)) {
+     if ((m_timer.get() >4 ) && (m_timer.get()<6)) {
       teleScope.stopMotor();
        //m_doubleSolenoid.set(DoubleSolenoid.Value.kForward); //for cones again*
        //secondSolenoid.set(DoubleSolenoid.Value.kForward);
@@ -119,11 +102,104 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
       teleScope.setInverted(true);
        teleScope.set(0.5);
 
-       if (m_timer.get() >14) {
+       if (m_timer.get() >6) {
         teleScope.stopMotor();
        }
+     msClarke.arcadeDrive (0.5, 0.0, isAutonomous);
+     }
+   
+    if (bellerika == 2) {
+     // Drive for 2 seconds
+     // cone and jet
+     if ((m_timer.get() >0 ) && (m_timer.get()<2)) {
+       // Drive forwards half speed, make sure to turn input squaring off
+       //msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
+       //msClarke.arcadeDrive(0.0, 0.5, isAutonomous());
+       tiltArm.set(0.5); //bigger
+     }
+     if ((m_timer.get() >2 ) && (m_timer.get()<4)) {
+      tiltArm.stopMotor();
+      teleScope.setInverted(false);
+        teleScope.set(0.5);
+     }
+     if ((m_timer.get() >4 ) && (m_timer.get()<6)) {
+      teleScope.stopMotor();
+      m_doubleSolenoid.set(DoubleSolenoid.Value.kForward); //for cones again*
+      secondSolenoid.set(DoubleSolenoid.Value.kForward);
+     }
+     if ((m_timer.get() >6 ) && (m_timer.get()<8)) {
+      m_doubleSolenoid.stopMotor();
+      secondSolenoid.stopMotor();
+      teleScope.setInverted(true);
+       teleScope.set(0.5);
+
+       if (m_timer.get() >8) {
+        teleScope.stopMotor();
+       }
+     msClarke.arcadeDrive (0.5, 0.0, isAutonomous);
      }
     
+    if (bellerika == 3) {
+     // Drive for 2 seconds
+     // cube and charge station
+     if ((m_timer.get() >0 ) && (m_timer.get()<2)) {
+       // Drive forwards half speed, make sure to turn input squaring off
+       //msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
+       //msClarke.arcadeDrive(0.0, 0.5, isAutonomous());
+       tiltArm.set(0.5); //bigger
+     }
+     if ((m_timer.get() >2 ) && (m_timer.get()<4)) {
+      tiltArm.stopMotor();
+      teleScope.setInverted(false);
+        teleScope.set(0.5);
+     }
+     if ((m_timer.get() >4 ) && (m_timer.get()<6)) {
+      teleScope.stopMotor();
+       //m_doubleSolenoid.set(DoubleSolenoid.Value.kForward); //for cones again*
+       //secondSolenoid.set(DoubleSolenoid.Value.kForward);
+     }
+      teleScope.setInverted(true);
+       teleScope.set(0.5);
+
+       if (m_timer.get() >6) {
+        teleScope.stopMotor();
+       }
+     msClarke.arcadeDrive (0.5, 0.0, isAutonomous);
+     //insert navX
+     }
+     
+     if (bellerika == 4) {
+     // Drive for 2 seconds
+     // cone and charge station
+     if ((m_timer.get() >0 ) && (m_timer.get()<2)) {
+       // Drive forwards half speed, make sure to turn input squaring off
+       //msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
+       //msClarke.arcadeDrive(0.0, 0.5, isAutonomous());
+       tiltArm.set(0.5); //bigger
+     }
+     if ((m_timer.get() >2 ) && (m_timer.get()<4)) {
+      tiltArm.stopMotor();
+      teleScope.setInverted(false);
+        teleScope.set(0.5);
+     }
+     if ((m_timer.get() >4 ) && (m_timer.get()<6)) {
+      teleScope.stopMotor();
+      m_doubleSolenoid.set(DoubleSolenoid.Value.kForward); //for cones again*
+      secondSolenoid.set(DoubleSolenoid.Value.kForward);
+     }
+     if ((m_timer.get() >6 ) && (m_timer.get()<8)) {
+      m_doubleSolenoid.stopMotor();
+      secondSolenoid.stopMotor();
+      teleScope.setInverted(true);
+       teleScope.set(0.5);
+
+       if (m_timer.get() >8) {
+        teleScope.stopMotor();
+       }
+     msClarke.arcadeDrive (0.5, 0.0, isAutonomous);
+      //insert navX
+     }
+   }
    
  
    //This function is called once each time the robot enters teleoperated mode.
