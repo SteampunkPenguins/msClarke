@@ -60,8 +60,8 @@ import edu.wpi.first.cameraserver.CameraServer;
   private final DigitalInput coneCharge = new DigitalInput(4);
   
   //Safety features
-  private final boolean tiltSafety = true
-  private final boolean teleScopeSafety = true
+  private final boolean tiltSafety = true;
+  private final boolean teleScopeSafety = true;
   
 
    //Navx
@@ -69,19 +69,13 @@ import edu.wpi.first.cameraserver.CameraServer;
 
    //Solenoids
    private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
-   //private final DoubleSolenoid secondSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 4);
-   //private static final int kSolenoidButton = 1;
-   //private static final int kDoubleSolenoidForward = 2; //the button which operates the solenoid
-   //private static final int kDoubleSolenoidReverse = 3;
 
 
-   // Compressor Varibales [RO] still working on figuring this out.
-   Compressor compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
-   //Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
-   
-   boolean enabled = compressor.isEnabled();
-   boolean pressureSwitch = compressor.getPressureSwitchValue();
-   double current = compressor.getPressure();
+   // Compressor Varibales
+   Compressor compressor = new Compressor(0, PneumaticsModuleType.CTREPCM); //compressor object
+   boolean enabled = compressor.isEnabled(); // checks if the compressor is on
+   boolean pressureSwitch = compressor.getPressureSwitchValue(); // pressure switch's state
+   double current = compressor.getPressure(); //current pressure from pressure transducer.
    
    //Shuffleboard Variables
    private static final String kDefaultAuto = "Default";
@@ -152,6 +146,7 @@ import edu.wpi.first.cameraserver.CameraServer;
      SmartDashboard.putBoolean("coneCharge", coneCharge.get());
      SmartDashboard.putNumber("Pressure", compressor.getPressure());
      SmartDashboard.putBoolean("Compressor ON?" compressor.isEnabled());
+     SmartDashboard.putBoolean("Pressure Switch", compressor.getPressureSwitchValue());
      
     if (compressor.getPressure() < 120){
       compressor.enableDigital();
@@ -342,12 +337,13 @@ import edu.wpi.first.cameraserver.CameraServer;
      //msClarke.arcadeDrive(-driver.getLeftY(), -driver.getRightX());
      // Arm Controls
     //conditionals to check if the safteys are not false.
+    if (teleScopeSafety == false && armController.getLeftY() > 0) {
+     teleScope.set(0.3);
+    }
     
-     teleScope.set(armController.getLeftY());
-    // we must allow the arm to still move in one direction even after the safetys are tripped.
-    
-     tiltArm.set((armController.getRightY()/2));
-    
+    if (tiltSafety == false && armController.getRightY() > 0) {
+     tiltArm.set(1.0);
+    }
      // Claw Controls
     //clawIntake.arcadeDrive(armController.getLeftTriggerAxis(), 0.0);
     //clawIntake.arcadeDrive((armController.getRightTriggerAxis()*-1), 0.0);
