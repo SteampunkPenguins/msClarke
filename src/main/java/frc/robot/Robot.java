@@ -4,17 +4,11 @@
  */
 
 package frc.robot;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-
 import java.security.Key;
-
 import com.kauailabs.navx.frc.AHRS;
-
-
-
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -64,6 +58,10 @@ import edu.wpi.first.cameraserver.CameraServer;
   private final DigitalInput coneJet = new DigitalInput(2);
   private final DigitalInput cubeCharge = new DigitalInput(3);
   private final DigitalInput coneCharge = new DigitalInput(4);
+  
+  //Safety features
+  private final boolean tiltSafety = true
+  private final boolean teleScopeSafety = true
   
 
    //Navx
@@ -152,8 +150,8 @@ import edu.wpi.first.cameraserver.CameraServer;
      SmartDashboard.putBoolean("coneJet", coneJet.get());
      SmartDashboard.putBoolean("cubeCharge", cubeCharge.get());
      SmartDashboard.putBoolean("coneCharge", coneCharge.get());
-     SmartDashboard.putNumber("compressor.getPressure", compressor.getPressure());
-     SmartDashboard.putBoolean("compressor.enableDigital", enabled);
+     SmartDashboard.putNumber("Pressure", compressor.getPressure());
+     SmartDashboard.putBoolean("Compressor ON?" compressor.isEnabled());
      
     if (compressor.getPressure() < 120){
       compressor.enableDigital();
@@ -171,7 +169,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 
      m_autoSelected = m_chooser.getSelected();
      // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-     System.out.println("Auto selected: " + m_autoSelected);
+     //System.out.println("Auto selected: " + m_autoSelected);
    }
  
    //This function is called periodically (20ms) during autonomous.
@@ -185,12 +183,12 @@ import edu.wpi.first.cameraserver.CameraServer;
         balance = true;
         msClarke.stopMotor();
         leftDrive.setInverted(true);
-        msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
+        msClarke.arcadeDrive(0.1, 0.0, isAutonomous());
         }
           else if (navX.getRoll() <= 10) {
           msClarke.stopMotor();
           leftDrive.setInverted(false);
-          msClarke.arcadeDrive(0.5, 0.0, isAutonomous());
+          msClarke.arcadeDrive(0.1, 0.0, isAutonomous());
           }
            else {
            msClarke.stopMotor();
@@ -343,9 +341,13 @@ import edu.wpi.first.cameraserver.CameraServer;
      //Drive Train controls
      //msClarke.arcadeDrive(-driver.getLeftY(), -driver.getRightX());
      // Arm Controls
+    //conditionals to check if the safteys are not false.
+    
      teleScope.set(armController.getLeftY());
-
-     tiltArm.set(armController.getRightY());
+    // we must allow the arm to still move in one direction even after the safetys are tripped.
+    
+     tiltArm.set((armController.getRightY()/2));
+    
      // Claw Controls
     //clawIntake.arcadeDrive(armController.getLeftTriggerAxis(), 0.0);
     //clawIntake.arcadeDrive((armController.getRightTriggerAxis()*-1), 0.0);
